@@ -16,8 +16,8 @@ var UserTable = (function (_super) {
     }
     UserTable.prototype.init = function () {
         var _this = this;
-        this.db.run('CREATE TABLE user (id int primary key not null)', function () {
-            _this.dispatchEvent(new tevents.Event('initialized'));
+        this.db.run('CREATE TABLE IF NOT EXISTS user (' + 'id INT PRIMARY KEY NOT NULL,' + 'email TEXT NOT NULL,' + 'password TEXT NOT NULL)', function () {
+            return _this.dispatchEvent(new tevents.Event('initialized'));
         });
     };
     return UserTable;

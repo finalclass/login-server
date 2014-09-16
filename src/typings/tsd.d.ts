@@ -4,3 +4,4 @@
 /// <reference path="try/try.d.ts" />
 /// <reference path="tevents/tevents.d.ts" />
 /// <reference path="node.extend/node.extend.d.ts" />
+/// <reference path="debug/debug.d.ts" />

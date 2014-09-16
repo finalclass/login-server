@@ -12,9 +12,11 @@ class UserTable extends tevents.Dispatcher {
   }
 
   private init():void {
-    this.db.run('CREATE TABLE user (id int primary key not null)', ():void => {
-      this.dispatchEvent(new tevents.Event('initialized'));
-    });
+    this.db.run('CREATE TABLE IF NOT EXISTS user (' +
+        'id INT PRIMARY KEY NOT NULL,' +
+        'email TEXT NOT NULL,' +
+        'password TEXT NOT NULL)',
+      () => this.dispatchEvent(new tevents.Event('initialized')));
   }
 
 }

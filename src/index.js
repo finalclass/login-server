@@ -1,6 +1,5 @@
 /// <reference path="typings/tsd.d.ts" />
-var debug = require('debug')('login-server');
-
+var logger = require('./logger');
 var sqlite3 = require('sqlite3');
 var tryjs = require('try');
 var Config = require('./Config');
@@ -13,12 +12,13 @@ var db = new sqlite3.Database(config.dbFilePath);
 var userTable = new UserTable(db);
 
 tryjs(function () {
-    return userTable.on('initialized', tryjs.pause());
+    return userTable.once('initialized', tryjs.pause());
 })(function () {
-    debug('Database initialized');
+    logger('Database initialized');
     server.run();
-    debug('Listening on port ' + config.port);
+    logger('Listening on port ' + config.port);
 }).catch(function (err) {
-    return console.log(err);
+    db.close();
+    logger.error(err.toString());
 });
 //# sourceMappingURL=index.js.map
