@@ -46,6 +46,14 @@ var Config = (function () {
         enumerable: true,
         configurable: true
     });
+
+    Object.defineProperty(Config.prototype, "viewsDir", {
+        get: function () {
+            return this.data.viewsDir;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return Config;
 })();
 

@@ -42,6 +42,10 @@ class Config {
     return this.data.dbFilePath;
   }
 
+  public get viewsDir() : string {
+    return this.data.viewsDir;
+  }
+
 }
 
 export = Config;

@@ -18,12 +18,15 @@ class Bootstrap {
   private loginTable:LoginTable;
   private loginService:LoginService;
 
-  constructor() {
+  constructor(config?:Config) {
+    if (config) {
+      this.config = config;
+    }
     this.errorHandler = this.errorHandler.bind(this);
     logger.bootstrap('new Bootstrap created');
   }
 
-  public run():void {
+  public run(next:(err:Error)=>void):void {
     tryjs
     (() => logger.bootstrap('run started'))
     (() => this.instantiate(tryjs.pause()))
@@ -32,17 +35,25 @@ class Bootstrap {
     (() => this.initDB(tryjs.pause()))
     (tryjs.throwFirstArgument)
     (() => logger.bootstrap('database ready'))
-    (() => this.server.run())
+    (() => this.server.run(tryjs.pause()))
     (() => logger.bootstrap('server started'))
     (() => logger.bootstrap('complete'))
+    (next)
     .catch((err:Error) => {
-      logger.bootstrap('Error:(')
+      logger.bootstrap('Error:(');
       this.errorHandler(err);
+      next(err);
     });
   }
 
+  public shutDown():void {
+    if (this.server && this.server.server) {
+      this.server.server.close();
+    }
+  }
+
   private instantiate(next:(err?:Error)=>void):void {
-    this.config = new Config();
+    this.config = this.config || new Config();
     this.server = new HTTPServer(this.config);
     this.db = new sqlite3.Database(this.config.dbFilePath);
     this.userTable = new UserTable(this.db);
@@ -77,7 +88,6 @@ class Bootstrap {
     } else {
       logger.error('Unknown error occurred in Bootstrap');
     }
-
   }
 
 }

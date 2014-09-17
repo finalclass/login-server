@@ -2,12 +2,15 @@
 var logger = require('./logger');
 var express = require('express');
 
+var ect = require('ect');
+
 var HTTPServer = (function () {
     function HTTPServer(config) {
         this.config = config;
         this._app = express();
         this.enableStaticFileAccess();
         this.allowCORSFromAll();
+        this.enableTemplateEngine();
     }
     Object.defineProperty(HTTPServer.prototype, "app", {
         get: function () {
@@ -17,9 +20,30 @@ var HTTPServer = (function () {
         configurable: true
     });
 
-    HTTPServer.prototype.run = function () {
-        this.app.listen(this.config.port);
-        logger.httpServer('listening on port ' + this.config.port);
+    Object.defineProperty(HTTPServer.prototype, "server", {
+        get: function () {
+            return this._server;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+    HTTPServer.prototype.run = function (next) {
+        var _this = this;
+        this._server = this.app.listen(this.config.port, function () {
+            logger.httpServer('listening on port ' + _this.config.port);
+            next();
+        });
+    };
+
+    HTTPServer.prototype.enableTemplateEngine = function () {
+        this.app.set('views', this.config.viewsDir);
+        this.app.set('view engine', 'ect');
+        this.app.engine('ect', ect({
+            watch: true,
+            root: this.config.viewsDir,
+            ext: '.ect'
+        }).render);
     };
 
     HTTPServer.prototype.allowCORSFromAll = function () {

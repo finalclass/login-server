@@ -2,7 +2,8 @@ module.exports = {
   default: {
     port: 4690,
     publicDir: __dirname + '/../public',
-    dbFilePath: __dirname + '/../var/login-server.sqlite'
+    dbFilePath: __dirname + '/../var/login-server.sqlite',
+    viewsDir: __dirname + '/../views'
   },
   production: {
   }

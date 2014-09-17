@@ -2,10 +2,15 @@
 var LoginService = (function () {
     function LoginService(server) {
         this.server = server;
-        this.server.app.get('/session-id', this.getSessionId.bind(this));
+        this.server.app.get('/login/id', LoginService.getSessionId.bind(this));
+        this.server.app.get('/login/form', LoginService.getLoginForm);
     }
-    LoginService.prototype.getSessionId = function (req, res) {
-        res.json(200, { status: 'ok' });
+    LoginService.getSessionId = function (req, res) {
+        res.status(200).json(Math.floor(Math.random() * 1e14).toString(36));
+    };
+
+    LoginService.getLoginForm = function (req, res) {
+        res.render('login');
     };
     return LoginService;
 })();
