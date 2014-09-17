@@ -4,13 +4,19 @@ var express = require('express');
 
 var ect = require('ect');
 
+var bodyParser = require('body-parser');
+var stylus = require('stylus');
+var nib = require('nib');
+
 var HTTPServer = (function () {
     function HTTPServer(config) {
         this.config = config;
         this._app = express();
+        this.enableStylus();
         this.enableStaticFileAccess();
         this.allowCORSFromAll();
         this.enableTemplateEngine();
+        this.enableBodyParser();
     }
     Object.defineProperty(HTTPServer.prototype, "app", {
         get: function () {
@@ -34,6 +40,19 @@ var HTTPServer = (function () {
             logger.httpServer('listening on port ' + _this.config.port);
             next();
         });
+    };
+
+    HTTPServer.prototype.enableBodyParser = function () {
+        this.app.use(bodyParser.urlencoded());
+    };
+
+    HTTPServer.prototype.enableStylus = function () {
+        this.app.use(stylus.middleware({
+            src: __dirname + '/../public/',
+            compile: function compile(str, path) {
+                return stylus(str).set('filename', path).set('compress', true).use(nib());
+            }
+        }));
     };
 
     HTTPServer.prototype.enableTemplateEngine = function () {

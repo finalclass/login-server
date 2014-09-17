@@ -30,6 +30,10 @@ var UserTable = (function (_super) {
             return _this.dispatchEvent(new tevents.Event('error'));
         });
     };
+
+    UserTable.prototype.findByEmail = function (email, next) {
+        this.db.get('SELECT * FROM user WHERE email=?', email, next);
+    };
     return UserTable;
 })(tevents.Dispatcher);
 

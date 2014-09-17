@@ -6,6 +6,11 @@ import Config = require('./Config');
 import http = require('http');
 import ect = require('ect');
 
+var bodyParser = require('body-parser');
+var stylus = require('stylus');
+var nib = require('nib');
+
+
 class HTTPServer {
 
   private _app:express.Application;
@@ -13,9 +18,11 @@ class HTTPServer {
 
   constructor(private config:Config) {
     this._app = express();
+    this.enableStylus();
     this.enableStaticFileAccess();
     this.allowCORSFromAll();
     this.enableTemplateEngine();
+    this.enableBodyParser();
   }
 
   public get app():express.Application {
@@ -31,6 +38,22 @@ class HTTPServer {
       logger.httpServer('listening on port ' + this.config.port);
       next();
     });
+  }
+
+  private enableBodyParser():void {
+    this.app.use(bodyParser.urlencoded());
+  }
+
+  private enableStylus():void {
+    this.app.use(stylus.middleware({
+      src: __dirname + '/../public/',
+      compile: function compile(str, path) {
+        return stylus(str)
+          .set('filename', path)
+          .set('compress', true)
+          .use(nib());
+      }
+    }));
   }
 
   private enableTemplateEngine():void {

@@ -3,6 +3,7 @@ var HTTPServer = require('../src/HTTPServer');
 var request = require('request');
 var path = require('path');
 var cheerio = require('cheerio');
+var tryjs = require('try');
 
 describe('login-service', function () {
 
@@ -39,15 +40,27 @@ describe('login-service', function () {
     });
   });
 
-  it('sends login form', function (next) {
-    request(baseURL + '/login/form', function (err, response, body) {
+  function getLoginForm(errNext, next) {
+    request(baseURL + '/login', function (err, response, body) {
       if (err) {
-        next(err);
+        errNext(err);
       } else {
-        var $ = cheerio.load(body);
-        console.log($('body').text());
-        next();
+        next(cheerio.load(body));
       }
+    });
+  }
+
+  it('login form has email input', function (next) {
+    getLoginForm(next, function ($) {
+      expect($('input[name="email"]').length).toBeGreaterThan(0);
+      next();
+    });
+  });
+
+  it('has login form with password field', function (next) {
+    getLoginForm(next, function ($) {
+      expect($('input[name="password"]').length).toBeGreaterThan(0);
+      next();
     });
   });
 

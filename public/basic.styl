@@ -1,0 +1,37 @@
+@import "nib"
+@import "michroma-font/michroma-font"
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body, input, button {
+  font-family: "Michroma";
+  font-weight: normal;
+  font-style: normal;
+}
+
+input[type="text"], input[type="password"], input[type="email"] {
+  border-radius: 3px;
+  border: solid 1px #000;
+  padding: 2px 5px;
+  box-sizing: border;
+}
+
+
+.btn {
+  border-radius: 3px;
+  background: none;
+  border: solid 1px #000;
+  cursor: pointer;
+  &:hover {
+    background-color: #ddd;
+  }
+  &:active {
+    position:relative;
+    top: -2px;
+    left: -2px;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5);
+  }
+}

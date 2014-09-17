@@ -11,7 +11,10 @@
     "sqlite3": "~2.2.7",
     "tevents": "*",
     "debug": "~2.0.0",
-    "ect": "~0.5.9"
+    "ect": "~0.5.9",
+    "stylus": "~0.48.1",
+    "nib": "~1.0.3",
+    "body-parser": "~1.8.2"
   },
   "devDependencies": {
     "jasmine": "~2.0.1",
