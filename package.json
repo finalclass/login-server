@@ -11,12 +11,12 @@
     "sqlite3": "~2.2.7",
     "tevents": "*",
     "debug": "~2.0.0",
-    "ect": "~0.5.9",
-    "jquery": "~2.1.1"
+    "ect": "~0.5.9"
   },
   "devDependencies": {
     "jasmine": "~2.0.1",
-    "request": "~2.42.0"
+    "request": "~2.42.0",
+    "cheerio": "~0.17.0"
   },
   "scripts": {
     "start": "DEBUG=login-server* node index.js",

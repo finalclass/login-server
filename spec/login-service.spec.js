@@ -2,7 +2,7 @@ var LoginService = require('../src/service/LoginService');
 var HTTPServer = require('../src/HTTPServer');
 var request = require('request');
 var path = require('path');
-var $ = require('jquery');
+var cheerio = require('cheerio');
 
 describe('login-service', function () {
 
@@ -44,7 +44,8 @@ describe('login-service', function () {
       if (err) {
         next(err);
       } else {
-        console.log($(body));
+        var $ = cheerio.load(body);
+        console.log($('body').text());
         next();
       }
     });
