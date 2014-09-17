@@ -13,7 +13,8 @@
     "debug": "~2.0.0"
   },
   "devDependencies": {
-    "jasmine": "~2.0.1"
+    "jasmine": "~2.0.1",
+    "request": "~2.42.0"
   },
   "scripts": {
     "start": "DEBUG=login-server* node index.js",

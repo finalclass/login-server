@@ -8,6 +8,7 @@ import Config = require('./Config');
 import HTTPServer = require('./HTTPServer');
 import UserTable = require('./model/UserTable');
 import LoginTable = require('./model/LoginTable');
+import LoginService = require('./service/LoginService');
 
 class Bootstrap {
   private config:Config;
@@ -15,6 +16,7 @@ class Bootstrap {
   private db:sqlite3.Database;
   private userTable:UserTable;
   private loginTable:LoginTable;
+  private loginService:LoginService;
 
   constructor() {
     this.errorHandler = this.errorHandler.bind(this);
@@ -45,6 +47,7 @@ class Bootstrap {
     this.db = new sqlite3.Database(this.config.dbFilePath);
     this.userTable = new UserTable(this.db);
     this.loginTable = new LoginTable(this.db);
+    this.loginService = new LoginService(this.server);
     next();
   }
 

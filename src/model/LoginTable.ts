@@ -17,7 +17,7 @@ class LoginTable extends tevents.Dispatcher {
       'userId INT NOT NULL,' +
       'cratedAt INT NOT NULL,' +
       'sessionId TEXT NOT NULL)';
-    var indexQuery:string = 'CREATE INDEX IF NOT EXISTS222 login_to_user_id_idx ON login(userId)';
+    var indexQuery:string = 'CREATE INDEX IF NOT EXISTS login_to_user_id_idx ON login(userId)';
 
     tryjs
     (() => logger.dbQuery(tableQuery))

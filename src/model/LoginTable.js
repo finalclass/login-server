@@ -19,7 +19,7 @@ var LoginTable = (function (_super) {
     LoginTable.prototype.init = function () {
         var _this = this;
         var tableQuery = 'CREATE TABLE IF NOT EXISTS login (' + 'id INT PRIMARY KEY NOT NULL,' + 'userId INT NOT NULL,' + 'cratedAt INT NOT NULL,' + 'sessionId TEXT NOT NULL)';
-        var indexQuery = 'CREATE INDEX IF NOT EXISTS222 login_to_user_id_idx ON login(userId)';
+        var indexQuery = 'CREATE INDEX IF NOT EXISTS login_to_user_id_idx ON login(userId)';
 
         tryjs(function () {
             return logger.dbQuery(tableQuery);

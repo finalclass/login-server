@@ -7,6 +7,7 @@ var Config = require('./Config');
 var HTTPServer = require('./HTTPServer');
 var UserTable = require('./model/UserTable');
 var LoginTable = require('./model/LoginTable');
+var LoginService = require('./service/LoginService');
 
 var Bootstrap = (function () {
     function Bootstrap() {
@@ -43,6 +44,7 @@ var Bootstrap = (function () {
         this.db = new sqlite3.Database(this.config.dbFilePath);
         this.userTable = new UserTable(this.db);
         this.loginTable = new LoginTable(this.db);
+        this.loginService = new LoginService(this.server);
         next();
     };
 
