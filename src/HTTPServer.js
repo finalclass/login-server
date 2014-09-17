@@ -1,4 +1,5 @@
 /// <reference path="typings/tsd.d.ts" />
+var logger = require('./logger');
 var express = require('express');
 
 var HTTPServer = (function () {
@@ -18,6 +19,7 @@ var HTTPServer = (function () {
 
     HTTPServer.prototype.run = function () {
         this.app.listen(this.config.port);
+        logger.httpServer('listening on port ' + this.config.port);
     };
 
     HTTPServer.prototype.allowCORSFromAll = function () {

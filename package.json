@@ -16,7 +16,7 @@
     "jasmine": "~2.0.1"
   },
   "scripts": {
-    "start": "DEBUG=* node index.js",
+    "start": "DEBUG=login-server* node index.js",
     "test": "jasmine-node spec/"
   },
   "repository": {

@@ -5,19 +5,29 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var tryjs = require('try');
+
 var tevents = require('tevents');
+var logger = require('../logger');
 
 var UserTable = (function (_super) {
     __extends(UserTable, _super);
     function UserTable(db) {
         _super.call(this);
         this.db = db;
-        this.init();
     }
     UserTable.prototype.init = function () {
         var _this = this;
-        this.db.run('CREATE TABLE IF NOT EXISTS user (' + 'id INT PRIMARY KEY NOT NULL,' + 'email TEXT NOT NULL,' + 'password TEXT NOT NULL)', function () {
+        var query = 'CREATE TABLE IF NOT EXISTS user (' + 'id INT PRIMARY KEY NOT NULL,' + 'email TEXT NOT NULL,' + 'password TEXT NOT NULL,' + 'createdAt INT NOT NULL,' + 'modifiedAt INT NOT NULL)';
+
+        tryjs(function () {
+            return logger.dbQuery(query);
+        })(function () {
+            return _this.db.run(query, tryjs.pause());
+        })(tryjs.throwFirstArgument)(function () {
             return _this.dispatchEvent(new tevents.Event('initialized'));
+        }).catch(function () {
+            return _this.dispatchEvent(new tevents.Event('error'));
         });
     };
     return UserTable;

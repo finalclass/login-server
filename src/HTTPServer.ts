@@ -1,5 +1,6 @@
 /// <reference path="typings/tsd.d.ts" />
 
+import logger = require('./logger');
 import express = require('express');
 import Config = require('./Config');
 
@@ -19,6 +20,7 @@ class HTTPServer {
 
   public run() : void {
     this.app.listen(this.config.port);
+    logger.httpServer('listening on port ' + this.config.port);
   }
 
   private allowCORSFromAll() : void {
