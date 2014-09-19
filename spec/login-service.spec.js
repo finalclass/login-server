@@ -89,7 +89,7 @@ describe('login-service', function () {
     });
   });
 
-  it('redirects after successfull login', function (next) {
+  it('redirects after successful login', function (next) {
     var user = {email: 'test@test', password: 'abcdef'};
 
     tryjs
