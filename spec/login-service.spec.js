@@ -4,7 +4,6 @@ var request = require('request');
 var cheerio = require('cheerio');
 
 describe('login-service', function () {
-
   var loginServer;
   var config = {
     port: 6770,

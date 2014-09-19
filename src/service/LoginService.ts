@@ -6,6 +6,7 @@ import LoginFormInput = require('./input/LoginFormInput');
 import UserTable = require('../model/UserTable');
 import LoginTable = require('../model/LoginTable');
 import IUser = require('../model/interfaces/IUser');
+import ILogin = require('../model/interfaces/ILogin');
 import tryjs = require('try');
 import logger = require('../logger');
 
@@ -16,7 +17,20 @@ class LoginService {
     this.server.app.get('/login/:sessionId', LoginService.setSessionId);
     this.server.app.get('/login', LoginService.getLoginForm);
     this.server.app.post('/login', this.postLoginForm.bind(this));
+    this.server.app.get('/login/check/:sessionId', this.checkLogin.bind(this));
     this.server.app.get('/login-complete', LoginService.getLoginCompletePage);
+  }
+
+  private checkLogin(req:express.Request, res:express.Response):void {
+    this.loginTable.find({sessionId: req.params.sessionId}, (err:Error, result:ILogin):void => {
+      if (err) {
+        res.status(500).json({status: 'error', reason: 'internal_server_error'});
+      } else if (!result) {
+        res.status(200).json({status: 'ok', isLogged: false});
+      } else {
+        res.status(200).json({status: 'ok', isLogged: true});
+      }
+    });
   }
 
   private postLoginForm(req:express.Request, res:express.Response):void {

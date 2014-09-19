@@ -23,8 +23,13 @@ describe('common-use-case', function () {
 
   it('runs', function (next) {
     var sid;
+    var jar = request.jar();
+    var user = {email: 'test@test', password: 'abcdef'};
 
     tryjs
+    (function () {
+      loginServer.userTable.insert(user, tryjs.pause());
+    })
     (function () {
       request({url: baseURL + '/login/id', json: true}, tryjs.pause());
     })
@@ -32,6 +37,20 @@ describe('common-use-case', function () {
     (function (response) {
       sid = response.body;
       expect(sid).toBeDefined();
+      request({url: baseURL + '/login/' + sid, jar: jar}, tryjs.pause());
+    })
+    (tryjs.throwFirstArgument)
+    (function (response) {
+      request.post({url: baseURL + '/login', form: user, jar: jar}, tryjs.pause());
+    })
+    (tryjs.throwFirstArgument)
+    (function (response) {
+      expect(response.body).toBe('Moved Temporarily. Redirecting to /login-complete');
+      request(baseURL + '/login/check/' + sid, tryjs.pause());
+    })
+    (tryjs.throwFirstArgument)
+    (function (response) {
+      console.log(response.body);
     })
     (function () {
       next();

@@ -35,11 +35,20 @@ var UserTable = (function (_super) {
         return crypto.createHash('md5').update(text).digest('hex');
     };
 
+    UserTable.prototype.clone = function (data) {
+        var obj = {};
+        Object.keys(data).forEach(function (key) {
+            return obj[key] = data[key];
+        });
+        return obj;
+    };
+
     UserTable.prototype.insert = function (data, next) {
         data.createdAt = new Date().getTime();
         data.modifiedAt = data.createdAt;
-        data.password = this.md5(data.password);
-        SQLiteTable.prototype.insert.call(this, data, next);
+        var dataClone = this.clone(data);
+        dataClone.password = this.md5(data.password);
+        SQLiteTable.prototype.insert.call(this, dataClone, next);
     };
 
     UserTable.prototype.update = function (data, next) {

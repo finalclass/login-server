@@ -35,11 +35,18 @@ class UserTable extends SQLiteTable {
     return crypto.createHash('md5').update(text).digest('hex');
   }
 
+  private clone(data:any):any {
+    var obj:any = {};
+    Object.keys(data).forEach((key:string):void => obj[key] = data[key]);
+    return obj;
+  }
+
   public insert(data:any, next:(err?:Error)=>void):void {
     data.createdAt = new Date().getTime();
     data.modifiedAt = data.createdAt;
-    data.password = this.md5(data.password);
-    SQLiteTable.prototype.insert.call(this, data, next);
+    var dataClone:any = this.clone(data);
+    dataClone.password = this.md5(data.password);
+    SQLiteTable.prototype.insert.call(this, dataClone, next);
   }
 
   public update(data:any, next:(err?:Error)=>void):void {

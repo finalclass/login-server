@@ -13,8 +13,21 @@ var LoginService = (function () {
         this.server.app.get('/login/:sessionId', LoginService.setSessionId);
         this.server.app.get('/login', LoginService.getLoginForm);
         this.server.app.post('/login', this.postLoginForm.bind(this));
+        this.server.app.get('/login/check/:sessionId', this.checkLogin.bind(this));
         this.server.app.get('/login-complete', LoginService.getLoginCompletePage);
     }
+    LoginService.prototype.checkLogin = function (req, res) {
+        this.loginTable.find({ sessionId: req.params.sessionId }, function (err, result) {
+            if (err) {
+                res.status(500).json({ status: 'error', reason: 'internal_server_error' });
+            } else if (!result) {
+                res.status(200).json({ status: 'ok', isLogged: false });
+            } else {
+                res.status(200).json({ status: 'ok', isLogged: true });
+            }
+        });
+    };
+
     LoginService.prototype.postLoginForm = function (req, res) {
         var _this = this;
         var input = new LoginFormInput(this.userTable, req.body.email, req.body.password);
