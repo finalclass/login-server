@@ -46,7 +46,7 @@ describe('common-use-case', function () {
     (tryjs.throwFirstArgument)
     (function (response) {
       expect(response.body).toBe('Moved Temporarily. Redirecting to /login-complete');
-      request(baseURL + '/login/check/' + sid, tryjs.pause());
+      request({url: baseURL + '/login/check/' + sid, json: true}, tryjs.pause());
     })
     (tryjs.throwFirstArgument)
     (function (response) {
