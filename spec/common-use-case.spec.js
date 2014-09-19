@@ -50,7 +50,7 @@ describe('common-use-case', function () {
     })
     (tryjs.throwFirstArgument)
     (function (response) {
-      console.log(response.body);
+      expect(response.body.isLogged).toBeTruthy();
     })
     (function () {
       next();
