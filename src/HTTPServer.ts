@@ -7,6 +7,7 @@ import http = require('http');
 import ect = require('ect');
 
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser')
 var stylus = require('stylus');
 var nib = require('nib');
 
@@ -23,6 +24,7 @@ class HTTPServer {
     this.allowCORSFromAll();
     this.enableTemplateEngine();
     this.enableBodyParser();
+    this.enableCookieParser();
   }
 
   public get app():express.Application {
@@ -41,7 +43,11 @@ class HTTPServer {
   }
 
   private enableBodyParser():void {
-    this.app.use(bodyParser.urlencoded());
+    this.app.use(bodyParser.urlencoded({extended: false}));
+  }
+
+  private enableCookieParser():void {
+    this.app.use(cookieParser());
   }
 
   private enableStylus():void {

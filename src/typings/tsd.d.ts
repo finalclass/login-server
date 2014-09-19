@@ -6,3 +6,4 @@
 /// <reference path="node.extend/node.extend.d.ts" />
 /// <reference path="debug/debug.d.ts" />
 /// <reference path="ect/ect.d.ts" />
+/// <reference path="sqlite-table/sqlite-table.d.ts" />

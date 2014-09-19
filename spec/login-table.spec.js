@@ -9,16 +9,7 @@ describe('login-table', function () {
   beforeEach(function (next) {
     db = new sqlite3.Database(':memory:');
     loginTable = new LoginTable(db);
-
-    loginTable.init();
-
-    loginTable.once('initialized', function (event) {
-      next();
-    });
-    loginTable.once('error', function (event) {
-      console.log(event.data);
-      next(event.data);
-    });
+    loginTable.init(next);
   });
 
   it('creates table', function (next) {
@@ -28,8 +19,15 @@ describe('login-table', function () {
     });
   });
 
-  it('creates index', function (next) {
-    db.get('SELECT name FROM sqlite_master WHERE type="index" AND name="login_to_user_id_idx"', function (err, result) {
+  it('creates userId index', function (next) {
+    db.get('SELECT name FROM sqlite_master WHERE type="index" AND name="user_id_idx"', function (err, result) {
+      expect(result).not.toBeNull();
+      next(err);
+    });
+  });
+
+  it('creates sessionId index', function (next) {
+    db.get('SELECT name FROM sqlite_master WHERE type="index" AND name="session_id_idx"', function (err, result) {
       expect(result).not.toBeNull();
       next(err);
     });

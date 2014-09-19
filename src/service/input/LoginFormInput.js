@@ -1,46 +1,57 @@
 /// <reference path="../../typings/tsd.d.ts"/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var tevents = require('tevents');
+var crypto = require('crypto');
 
-var LoginFormInput = (function (_super) {
-    __extends(LoginFormInput, _super);
-    function LoginFormInput(userTable, email, password) {
-        _super.call(this);
+var LoginFormInput = (function () {
+    function LoginFormInput(userTable, _email, _password) {
         this.userTable = userTable;
-        this.email = email;
-        this.password = password;
-        this.validate();
+        this._email = _email;
+        this._password = _password;
+        this.truncate();
     }
-    LoginFormInput.prototype.validate = function () {
-        var _this = this;
-        this.emailErrors = [];
-        this.passwordErrors = [];
+    LoginFormInput.prototype.truncate = function () {
+        this._emailErrors = [];
+        this._passwordErrors = [];
+    };
 
+    LoginFormInput.md5 = function (text) {
+        return crypto.createHash('md5').update(text).digest('hex');
+    };
+
+    LoginFormInput.prototype.validate = function (next) {
+        var _this = this;
+        this.truncate();
+
+        if (!this.email) {
+            this.emailErrors.push('E-mail must be specified');
+        }
+        if (!this.password) {
+            this.passwordErrors.push('Password must be specified');
+        }
+        if (!this.isValid) {
+            next();
+            return;
+        }
         if (this.email.length < 3) {
             this.emailErrors.push('E-mail address is too short');
         }
-        if (this.email.indexOf('@')) {
+        if (this.email.indexOf('@') === -1) {
             this.emailErrors.push('E-mail address should contain "@" character');
         }
         if (this.password.length < 6) {
             this.passwordErrors.push('Password should be at least 6 characters long');
         }
 
-        this.userTable.findByEmail(this.email, function (err, result) {
+        this.userTable.find({ email: this.email }, function (err, result) {
             if (err) {
-                _this.dispatchEvent(new tevents.DataEvent('error', err));
+                next(err);
+                return;
             }
             if (!result) {
                 _this.emailErrors.push('User with given e-mail address and password does not exists');
-            } else if (result.password !== _this.password) {
+            } else if (result.password !== LoginFormInput.md5(_this.password)) {
                 _this.passwordErrors.push('Password is not correct');
             }
-            _this.dispatchEvent(new tevents.Event('validated'));
+            next();
         });
     };
 
@@ -51,8 +62,40 @@ var LoginFormInput = (function (_super) {
         enumerable: true,
         configurable: true
     });
+
+    Object.defineProperty(LoginFormInput.prototype, "email", {
+        get: function () {
+            return this._email;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+    Object.defineProperty(LoginFormInput.prototype, "password", {
+        get: function () {
+            return this._password;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+    Object.defineProperty(LoginFormInput.prototype, "emailErrors", {
+        get: function () {
+            return this._emailErrors;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+    Object.defineProperty(LoginFormInput.prototype, "passwordErrors", {
+        get: function () {
+            return this._passwordErrors;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return LoginFormInput;
-})(tevents.Dispatcher);
+})();
 
 module.exports = LoginFormInput;
 //# sourceMappingURL=LoginFormInput.js.map

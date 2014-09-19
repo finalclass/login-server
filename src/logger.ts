@@ -7,11 +7,11 @@ function logger(msg:string):void {
 }
 
 module logger {
-  export var bootstrap = debug('login-server:Bootstrap');
-  export var httpServer = debug('login-server:HTTPServer')
-  export var log = debug('login-server');
-  export var error = debug('login-server:error');
-  export var dbQuery= debug('login-server:db-query');
+  export var bootstrap:(msg:string, ...args:any[])=>void = debug('login-server:Bootstrap');
+  export var httpServer:(msg:string, ...args:any[])=>void = debug('login-server:HTTPServer')
+  export var log:(msg:string, ...args:any[])=>void = debug('login-server');
+  export var error:(msg:string, ...args:any[])=>void = debug('login-server:error');
+  export var dbQuery:(msg:string, ...args:any[])=>void = debug('login-server:db-query');
 }
 
 export = logger;

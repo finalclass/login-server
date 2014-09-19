@@ -8,6 +8,7 @@ var HTTPServer = require('./HTTPServer');
 var UserTable = require('./model/UserTable');
 var LoginTable = require('./model/LoginTable');
 var LoginService = require('./service/LoginService');
+var UserService = require('./service/UserService');
 
 var Bootstrap = (function () {
     function Bootstrap(config) {
@@ -54,22 +55,17 @@ var Bootstrap = (function () {
         this.db = new sqlite3.Database(this.config.dbFilePath);
         this.userTable = new UserTable(this.db);
         this.loginTable = new LoginTable(this.db);
-        this.loginService = new LoginService(this.server);
+        this.loginService = new LoginService(this.server, this.userTable, this.loginTable);
+        this.userService = new UserService(this.server, this.userTable);
         next();
     };
 
     Bootstrap.prototype.initDB = function (next) {
         var _this = this;
-        this.userTable.on('error', this.errorHandler);
-        this.loginTable.on('error', this.errorHandler);
-
-        this.userTable.init();
-        this.loginTable.init();
-
         tryjs(function () {
-            _this.userTable.once('initialized', tryjs.pause());
-            _this.loginTable.once('initialized', tryjs.pause());
-        })(function (event) {
+            _this.userTable.init(tryjs.pause());
+            _this.loginTable.init(tryjs.pause());
+        })([tryjs.throwFirstArgumentInArray])(function () {
             return next();
         }).catch(next);
     };

@@ -5,6 +5,7 @@ var express = require('express');
 var ect = require('ect');
 
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var stylus = require('stylus');
 var nib = require('nib');
 
@@ -17,6 +18,7 @@ var HTTPServer = (function () {
         this.allowCORSFromAll();
         this.enableTemplateEngine();
         this.enableBodyParser();
+        this.enableCookieParser();
     }
     Object.defineProperty(HTTPServer.prototype, "app", {
         get: function () {
@@ -43,7 +45,11 @@ var HTTPServer = (function () {
     };
 
     HTTPServer.prototype.enableBodyParser = function () {
-        this.app.use(bodyParser.urlencoded());
+        this.app.use(bodyParser.urlencoded({ extended: false }));
+    };
+
+    HTTPServer.prototype.enableCookieParser = function () {
+        this.app.use(cookieParser());
     };
 
     HTTPServer.prototype.enableStylus = function () {

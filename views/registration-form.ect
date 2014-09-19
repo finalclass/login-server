@@ -1,0 +1,61 @@
+<form action="/register" method="post" class="registration-form horizontal-form">
+  <fieldset>
+    <legend>Login</legend>
+    <!-- Email -->
+    <div class="row">
+      <label for="login-input">Login<sub>(email)</sub></label>
+      <div class="input-with-errors">
+        <input type="email"
+               id="login-input"
+               class="<%- 'error' if @emailErrors?.length%>"
+               value="<%- @email %>"
+               name="email"/>
+        <% if @emailErrors?.length : %>
+        <ul class="errors">
+          <% for error in @emailErrors : %>
+          <li><%- error %></li>
+          <% end %>
+        </ul>
+        <% end %>
+      </div>
+    </div>
+    <!-- Password -->
+    <div class="row">
+      <label for="password-input">Password</label>
+      <div class="input-with-errors">
+        <input type="password"
+               id="password-input"
+               class="<%- 'error' if @passwordErrors?.length%>"
+               name="password"/>
+        <% if @passwordErrors?.length : %>
+        <ul class="errors">
+          <% for error in @passwordErrors :%>
+          <li><%- error %></li>
+          <% end %>
+        </ul>
+        <% end %>
+      </div>
+    </div>
+    <!-- Re-password -->
+    <div class="row">
+      <label for="repassword-input">Password</label>
+      <div class="input-with-errors">
+        <input type="password"
+               id="repassword-input"
+               class="<%- 'error' if @repasswordErrors?.length%>"
+               name="repassword"/>
+        <% if @repasswordErrors?.length : %>
+        <ul class="errors">
+          <% for error in @repasswordErrors :%>
+          <li><%- error %></li>
+          <% end %>
+        </ul>
+        <% end %>
+      </div>
+    </div>
+    <!-- Buttons -->
+    <div class="buttons">
+      <button class="btn submit-button">Register</button>
+    </div>
+  </fieldset>
+</form>

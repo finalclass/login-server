@@ -7,35 +7,47 @@ var __extends = this.__extends || function (d, b) {
 };
 var tryjs = require('try');
 
-var tevents = require('tevents');
 var logger = require('../logger');
+
+var SQLiteTable = require('sqlite-table');
+var crypto = require('crypto');
 
 var UserTable = (function (_super) {
     __extends(UserTable, _super);
     function UserTable(db) {
-        _super.call(this);
-        this.db = db;
+        _super.call(this, db);
+        this.tableName = 'user';
     }
-    UserTable.prototype.init = function () {
+    UserTable.prototype.init = function (next) {
         var _this = this;
-        var query = 'CREATE TABLE IF NOT EXISTS user (' + 'id INT PRIMARY KEY NOT NULL,' + 'email TEXT NOT NULL,' + 'password TEXT NOT NULL,' + 'createdAt INT NOT NULL,' + 'modifiedAt INT NOT NULL)';
+        var query = 'CREATE TABLE IF NOT EXISTS user (' + 'id INTEGER PRIMARY KEY NOT NULL,' + 'email TEXT NOT NULL,' + 'password TEXT NOT NULL,' + 'createdAt INT NOT NULL,' + 'modifiedAt INT NOT NULL)';
 
         tryjs(function () {
             return logger.dbQuery(query);
         })(function () {
             return _this.db.run(query, tryjs.pause());
         })(tryjs.throwFirstArgument)(function () {
-            return _this.dispatchEvent(new tevents.Event('initialized'));
-        }).catch(function () {
-            return _this.dispatchEvent(new tevents.Event('error'));
-        });
+            return next();
+        }).catch(next);
     };
 
-    UserTable.prototype.findByEmail = function (email, next) {
-        this.db.get('SELECT * FROM user WHERE email=?', email, next);
+    UserTable.prototype.md5 = function (text) {
+        return crypto.createHash('md5').update(text).digest('hex');
+    };
+
+    UserTable.prototype.insert = function (data, next) {
+        data.createdAt = new Date().getTime();
+        data.modifiedAt = data.createdAt;
+        data.password = this.md5(data.password);
+        SQLiteTable.prototype.insert.call(this, data, next);
+    };
+
+    UserTable.prototype.update = function (data, next) {
+        data.modifiedAt = new Date().getTime();
+        SQLiteTable.prototype.update.call(this, data, next);
     };
     return UserTable;
-})(tevents.Dispatcher);
+})(SQLiteTable);
 
 module.exports = UserTable;
 //# sourceMappingURL=UserTable.js.map

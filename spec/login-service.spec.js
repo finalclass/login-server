@@ -1,30 +1,26 @@
-var LoginService = require('../src/service/LoginService');
-var HTTPServer = require('../src/HTTPServer');
-var request = require('request');
-var path = require('path');
-var cheerio = require('cheerio');
+var Bootstrap = require('../src/Bootstrap');
 var tryjs = require('try');
+var request = require('request');
+var cheerio = require('cheerio');
 
 describe('login-service', function () {
 
-  var loginService;
-  var server;
+  var loginServer;
   var config = {
-    port: 6760,
+    port: 6770,
     publicDir: __dirname + '/../public',
-    viewsDir: path.resolve(__dirname, '..', 'views')
+    viewsDir: __dirname + ' /../views',
+    dbFilePath: ':memory:'
   };
   var baseURL = 'http://localhost:' + config.port;
 
   beforeEach(function (next) {
-    server = new HTTPServer(config);
-    loginService = new LoginService(server);
-
-    server.run(next);
+    loginServer = new Bootstrap(config);
+    loginServer.run(next);
   });
 
   afterEach(function () {
-    server.server.close();
+    loginServer.shutDown();
   });
 
   it('generates session id', function (next) {
@@ -50,6 +46,21 @@ describe('login-service', function () {
     });
   }
 
+  function postLoginForm(email, password, errNext, next) {
+    request.post(baseURL + '/login', {
+      form: {
+        email: email,
+        password: password
+      }
+    }, function (err, response, body) {
+      if (err) {
+        errNext(err);
+      } else {
+        next(cheerio.load(body), body);
+      }
+    });
+  }
+
   it('login form has email input', function (next) {
     getLoginForm(next, function ($) {
       expect($('input[name="email"]').length).toBeGreaterThan(0);
@@ -63,5 +74,35 @@ describe('login-service', function () {
       next();
     });
   });
+
+  it('fills the login after failure', function (next) {
+    postLoginForm('test@email.com', 'password', next, function ($) {
+      expect($('input[name="email"]').val()).toBe('test@email.com');
+      next();
+    });
+  });
+
+  it('does not fill the password after failure', function (next) {
+    postLoginForm('test@email.com', 'password', next, function ($) {
+      expect($('input[name="password"]').val()).toBeFalsy();
+      next();
+    });
+  });
+
+  it('redirects after successfull login', function (next) {
+    var user = {email: 'test@test', password: 'abcdef'};
+
+    tryjs
+    (function () {
+      loginServer.userTable.insert(user, tryjs.pause());
+    })
+    (tryjs.throwFirstArgument)
+    (function () {
+      postLoginForm('test@test', 'abcdef', next, function ($, raw) {
+        expect(raw).toBe('Moved Temporarily. Redirecting to /login-complete');
+        next();
+      });
+    });
+  })
 
 });

@@ -9,6 +9,7 @@ import HTTPServer = require('./HTTPServer');
 import UserTable = require('./model/UserTable');
 import LoginTable = require('./model/LoginTable');
 import LoginService = require('./service/LoginService');
+import UserService = require('./service/UserService');
 
 class Bootstrap {
   private config:Config;
@@ -17,6 +18,7 @@ class Bootstrap {
   private userTable:UserTable;
   private loginTable:LoginTable;
   private loginService:LoginService;
+  private userService:UserService;
 
   constructor(config?:Config) {
     if (config) {
@@ -58,24 +60,20 @@ class Bootstrap {
     this.db = new sqlite3.Database(this.config.dbFilePath);
     this.userTable = new UserTable(this.db);
     this.loginTable = new LoginTable(this.db);
-    this.loginService = new LoginService(this.server);
+    this.loginService = new LoginService(this.server, this.userTable, this.loginTable);
+    this.userService = new UserService(this.server, this.userTable);
     next();
   }
 
   private initDB(next:(err?:Error)=>void):void {
-    this.userTable.on('error', this.errorHandler);
-    this.loginTable.on('error', this.errorHandler);
-
-    this.userTable.init();
-    this.loginTable.init();
-
     tryjs
-    (():void => {
-      this.userTable.once('initialized', tryjs.pause());
-      this.loginTable.once('initialized', tryjs.pause());
+    (() => {
+      this.userTable.init(tryjs.pause());
+      this.loginTable.init(tryjs.pause());
     })
-    ((event:tevents.Event) => next())
-      .catch(next);
+    ([tryjs.throwFirstArgumentInArray])
+    (() => next())
+    .catch(next);
   }
 
   private errorHandler(err:any):void {

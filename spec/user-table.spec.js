@@ -9,16 +9,7 @@ describe('user-table', function () {
   beforeEach(function (next) {
     db = new sqlite3.Database(':memory:');
     userTable = new UserTable(db);
-
-    userTable.init();
-
-    userTable.once('initialized', function (event) {
-      next();
-    });
-    userTable.once('error', function (event) {
-      console.log(event.data);
-      next(event.data);
-    });
+    userTable.init(next);
   });
 
   it('creates table', function (next) {

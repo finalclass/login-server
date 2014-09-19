@@ -2,6 +2,17 @@
 @import "basic"
 
 .horizontal-form {
+  .errors {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    font-size: 10px;
+    color: #990000;
+  }
+  input.error {
+    border-color: #990000;
+  }
+
   .row {
     overflow: hidden;
     display: flex;
@@ -12,9 +23,17 @@
       flex: 1;
 
     }
-    input[type="text"], input[type="password"], input[type="email"] {
-      width: 200px;
+    .input-with-errors {
+      width: 300px;
+      input[type="text"], input[type="password"], input[type="email"] {
+        box-sizing: border-box;
+        width: 100%;
+      }
+      ul.errors {
+        width: 100%
+      }
     }
+
   }
   .buttons {
     text-align: right;

@@ -1,49 +1,83 @@
 /// <reference path="../../typings/tsd.d.ts"/>
 
 import UserTable = require('../../model/UserTable');
-import tevents = require('tevents');
 import IUser = require('../../model/interfaces/IUser');
+import crypto = require('crypto');
 
-class LoginFormInput extends tevents.Dispatcher {
+class LoginFormInput {
 
-  private emailErrors:string[];
-  private passwordErrors:string[];
+  private _emailErrors:string[];
+  private _passwordErrors:string[];
 
-  constructor(private userTable:UserTable, public email:string, public password:string) {
-    super();
-    this.validate();
+  constructor(private userTable:UserTable, private _email:string, private _password:string) {
+    this.truncate();
   }
 
-  private validate():void {
-    this.emailErrors = [];
-    this.passwordErrors = [];
+  private truncate() : void {
+    this._emailErrors = [];
+    this._passwordErrors = [];
+  }
 
+  private static md5(text:string) : string {
+    return crypto.createHash('md5').update(text).digest('hex');
+  }
+
+  public validate(next:(err?:Error)=>void):void {
+    this.truncate();
+    
+    if (!this.email) {
+      this.emailErrors.push('E-mail must be specified');
+    }
+    if (!this.password) {
+      this.passwordErrors.push('Password must be specified');
+    }
+    if (!this.isValid) { //if it's not valid now than stop
+      next();
+      return;
+    }
     if (this.email.length < 3) {
       this.emailErrors.push('E-mail address is too short');
     }
-    if (this.email.indexOf('@')) {
+    if (this.email.indexOf('@') === -1) {
       this.emailErrors.push('E-mail address should contain "@" character');
     }
     if (this.password.length < 6) {
       this.passwordErrors.push('Password should be at least 6 characters long');
     }
 
-    this.userTable.findByEmail(this.email,
+    this.userTable.find({email: this.email},
       (err:Error, result:IUser) => {
         if (err) {
-          this.dispatchEvent(new tevents.DataEvent('error', err));
+          next(err);
+          return;
         }
         if (!result) {
-          this.emailErrors.push('User with given e-mail address and password does not exists')
-        } else if (result.password !== this.password) {
+          this.emailErrors.push('User with given e-mail address and password does not exists');
+        } else if (result.password !== LoginFormInput.md5(this.password)) {
           this.passwordErrors.push('Password is not correct');
         }
-        this.dispatchEvent(new tevents.Event('validated'));
+        next();
       });
   }
 
   public get isValid():boolean {
     return this.emailErrors.length === 0 && this.passwordErrors.length === 0;
+  }
+
+  public get email() : string {
+    return this._email;
+  }
+
+  public get password() : string {
+    return this._password;
+  }
+
+  public get emailErrors() : string[] {
+    return this._emailErrors;
+  }
+
+  public get passwordErrors() : string[] {
+    return this._passwordErrors;
   }
 
 }
