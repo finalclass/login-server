@@ -31,10 +31,8 @@ var LoginService = (function () {
     LoginService.prototype.postLoginForm = function (req, res) {
         var _this = this;
         var input = new LoginFormInput(this.userTable, req.body.email, req.body.password);
-
-        if (!req.cookies.sessionId) {
-            req.cookies.sessionId = this.loginTable.generateSessionId();
-        }
+        var sid = req.cookies.sessionId || this.loginTable.generateSessionId();
+        res.cookie('sessionId', sid);
 
         tryjs(function () {
             return input.validate(tryjs.pause());
@@ -48,7 +46,7 @@ var LoginService = (function () {
         })(function () {
             return _this.userTable.find({ email: input.email }, tryjs.pause());
         })(tryjs.throwFirstArgument)(function (user) {
-            return _this.loginTable.login(user.id, req.cookies.sessionId, tryjs.pause());
+            return _this.loginTable.login(user.id, sid, tryjs.pause());
         })(tryjs.throwFirstArgument)(function () {
             return res.redirect('/login-complete');
         }).catch(function (err) {
@@ -58,7 +56,7 @@ var LoginService = (function () {
     };
 
     LoginService.setSessionId = function (req, res) {
-        req.cookies.sessionId = req.params.sessionId;
+        res.cookie('sessionId', req.params.sessionId);
         res.redirect('/login');
     };
 

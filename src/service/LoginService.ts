@@ -35,10 +35,8 @@ class LoginService {
 
   private postLoginForm(req:express.Request, res:express.Response):void {
     var input:LoginFormInput = new LoginFormInput(this.userTable, req.body.email, req.body.password);
-
-    if (!req.cookies.sessionId) {
-      req.cookies.sessionId = this.loginTable.generateSessionId();
-    }
+    var sid:string = req.cookies.sessionId || this.loginTable.generateSessionId();
+    res.cookie('sessionId', sid);
 
     tryjs
     (():void => input.validate(tryjs.pause()))
@@ -53,7 +51,7 @@ class LoginService {
     })
     (() => this.userTable.find({email: input.email}, tryjs.pause()))
     (tryjs.throwFirstArgument)
-    ((user:IUser):void => this.loginTable.login(user.id, req.cookies.sessionId, tryjs.pause()))
+    ((user:IUser):void => this.loginTable.login(user.id, sid, tryjs.pause()))
     (tryjs.throwFirstArgument)
     (():void => res.redirect('/login-complete'))
     .catch((err:Error):void => {
@@ -63,7 +61,7 @@ class LoginService {
   }
 
   private static setSessionId(req:express.Request, res:express.Response):void {
-    req.cookies.sessionId = req.params.sessionId;
+    res.cookie('sessionId', req.params.sessionId);
     res.redirect('/login');
   }
 
