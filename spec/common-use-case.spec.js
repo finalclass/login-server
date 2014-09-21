@@ -61,5 +61,4 @@ describe('common-use-case', function () {
     });
   });
 
-
 });
